@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: alarm-service
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        show_sql: true
+        format_sql: true
+
+    hibernate:
+      ddl-auto: update
+      hibernate:
+        transaction:
+          jta: platform:org.hibernate.service.jta.JtaPlatform
+
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/dayeyak
+    username: root
+    password: ${MYSQL_PWD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+#
+#  rabbitmq:
+#    host: localhost
+#    port: 5672
+#    username: guest
+#    password: guest
+#
+#
+#  server:
+#    port: 8080
+#
+#  eureka:
+#    client:
+#      service-url:
+#        defaultZone: http://localhost:19090/eureka
+
+
+
+#  ✨ feat	     해당 파일에 새로운 기능이 생김
+#  🎉 add	     없던 파일을 생성함, 초기 세팅
+#  🐛 fix	     버그 수정
+#  ♻️ refactor	 코드 리팩토링
+#  🚚 move	     파일 옮김/정리
+#  🔥 delete	   기능/파일 삭제
+#  ✅ test	     테스트 코드 작성
+#  🙈 gitfix	   gitignore 수정
+#  🔨 script	   build.gradle 변경, docker compose 변경
+#  📝 chore	   주석 추가 및 수정, 변수명 및 클래스명 수정
+#  ⚡️ improve	 개선
