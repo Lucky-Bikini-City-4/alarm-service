@@ -1,15 +1,23 @@
 package alarm_sevice.domain.alarm;
 
-import alarm_sevice.domain.alarm.dto.CreateRequestDto;
 import alarm_sevice.domain.alarm.dto.ResponseDto;
+import alarm_sevice.domain.alarm.kafkaDto.backoffice.BackofficeRegisterDto;
+import alarm_sevice.domain.alarm.kafkaDto.booking.*;
+import alarm_sevice.domain.alarm.kafkaDto.register.ServiceRegisterRequestDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AlarmService {
 
     private final AlarmRepository alarmRepository;
@@ -147,9 +155,7 @@ public class AlarmService {
     @Transactional
     public List<ResponseDto> getAllByUserId(Long userId) {
         List<Alarm> alarmList = alarmRepository.findAllByUserId(userId);
-        return alarmList.stream()
-                .map(ResponseDto::from)
-                .toList();
+        return alarmList.stream().map(ResponseDto::from).toList();
     }
 
     @Transactional
@@ -161,21 +167,32 @@ public class AlarmService {
     @Transactional
     public List<ResponseDto> getAll() {
         List<Alarm> alarmList = alarmRepository.findAll();
-        return alarmList.stream()
-                .map(ResponseDto::from)
-                .toList();
+        return alarmList.stream().map(ResponseDto::from).toList();
     }
 
     @Transactional
-    public ResponseDto create(CreateRequestDto requestDto) {
-        Alarm alarm = new Alarm(
-                requestDto.userId(),
-                requestDto.type(),
-                requestDto.serviceType(),
-                requestDto.serviceId(),
-                requestDto.title(),
-                requestDto.content());
-        Alarm savedAlarm = alarmRepository.save(alarm);
-        return ResponseDto.from(savedAlarm);
+    public void createAlarm(Alarm alarm) {
+        log.info(":::::[New Alarm Created]::::: " + alarm.getAlarmId());
+        alarmRepository.save(alarm);
+    }
+
+    private void sendAlarmSSE(Alarm alarm) {
+        Long userId = alarm.getUserId();
+        sendToClient(userId, alarm.getTitle(), alarm.getContent());
+    }
+
+    private void sendToClient(Long userId, Object title, Object content) {
+        SseEmitter emitter = emitterRepository.get(userId);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event().id(String.valueOf(userId)).name("Alarm SSE").data(title).data(content));
+                log.info(":::::SSE successfully sent to user: " + userId);
+            } catch (IOException exception) {
+                emitterRepository.deleteById(userId);
+                emitter.completeWithError(exception);
+                log.info(":::::SSE sent failed to user: " + userId);
+                throw new RuntimeException("SSE 전송 실패 : 연결 오류");
+            }
+        }
     }
 }
