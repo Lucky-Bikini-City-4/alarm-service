@@ -12,7 +12,5 @@ public record BookingRequestDto(
         String userName,
         String serviceName,
         LocalDateTime date
-
-
 ) {
 }
