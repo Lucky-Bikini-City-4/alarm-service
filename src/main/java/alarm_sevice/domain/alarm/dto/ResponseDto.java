@@ -1,7 +1,6 @@
 package alarm_sevice.domain.alarm.dto;
 
 import alarm_sevice.domain.alarm.Alarm;
-import alarm_sevice.domain.alarm.enums.AlarmType;
 import alarm_sevice.domain.alarm.enums.ServiceType;
 import lombok.Builder;
 
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
 public record ResponseDto(
         Long alarmId,
         Long userId,
-        AlarmType type,
         ServiceType serviceType,
         Long serviceId,
         String title,
@@ -23,7 +21,6 @@ public record ResponseDto(
         return ResponseDto.builder()
                 .alarmId(alarm.getAlarmId())
                 .userId(alarm.getUserId())
-                .type(alarm.getType())
                 .serviceType(alarm.getServiceType())
                 .serviceId(alarm.getServiceId())
                 .title(alarm.getTitle())
