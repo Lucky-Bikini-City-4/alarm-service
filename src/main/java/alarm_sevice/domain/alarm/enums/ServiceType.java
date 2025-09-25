@@ -5,5 +5,6 @@ public enum ServiceType {
     RESTAURANT,
     PERFORMANCE,
     EXHIBITION,
-    WAITING
+    WAITING,
+    BACKOFFICE
 }
