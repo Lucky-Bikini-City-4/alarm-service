@@ -1,4 +1,4 @@
-package alarm_sevice.domain.alarm.kafkaDto.booking;
+package alarm_sevice.kafka.booking;
 
 import alarm_sevice.domain.alarm.enums.ServiceType;
 

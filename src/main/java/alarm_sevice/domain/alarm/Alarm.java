@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
-@Data
 @Entity(name = "alarms")
 @NoArgsConstructor
 @Table

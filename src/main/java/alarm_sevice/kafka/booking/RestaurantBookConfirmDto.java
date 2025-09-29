@@ -1,10 +1,10 @@
-package alarm_sevice.domain.alarm.kafkaDto.booking;
+package alarm_sevice.kafka.booking;
 
 import alarm_sevice.domain.alarm.enums.ServiceType;
 
 import java.time.LocalDateTime;
 
-public record RestaurantBookDto(
+public record RestaurantBookConfirmDto(
         Long userId,
         ServiceType serviceType,
         Long serviceId,
@@ -12,6 +12,5 @@ public record RestaurantBookDto(
         String userName,
         Integer people,
         LocalDateTime date
-
 ) {
 }

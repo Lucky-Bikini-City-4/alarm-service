@@ -1,7 +1,6 @@
-package alarm_sevice.domain.alarm.kafkaDto.waiting;
+package alarm_sevice.kafka.waiting;
 
 import alarm_sevice.domain.alarm.enums.ServiceType;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 

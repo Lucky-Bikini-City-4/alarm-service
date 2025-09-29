@@ -1,4 +1,4 @@
-package alarm_sevice.domain.alarm;
+package alarm_sevice.domain.emitter;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -11,10 +11,8 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 public class EmitterRepository {
-    // 모든 Emitters를 저장하는 ConcurrentHashMap -> 동시성 이슈
-    private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+    private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>(); //동시성 제어
     private final Map<String, Object> eventCache = new ConcurrentHashMap<>();
-
 
     public SseEmitter get(String id) {
         return emitters.get(id);
