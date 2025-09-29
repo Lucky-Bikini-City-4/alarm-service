@@ -1,4 +1,4 @@
-package alarm_sevice.domain.alarm.kafkaDto.waiting;
+package alarm_sevice.kafka.waiting;
 
 import alarm_sevice.domain.alarm.enums.ServiceType;
 
@@ -10,9 +10,9 @@ public record CustomerWaitingDto(
         Long serviceId,
         CustomerWaitingType customerWaitingType,
         String userName,
-        Integer people,
+        Long people,
         LocalDateTime date,
-        Integer waiting
+        Long waiting
 
 ) {
 }
