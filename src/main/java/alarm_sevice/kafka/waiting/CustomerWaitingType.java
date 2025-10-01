@@ -1,4 +1,4 @@
-package alarm_sevice.domain.alarm.kafkaDto.waiting;
+package alarm_sevice.kafka.waiting;
 
 public enum CustomerWaitingType {
 
