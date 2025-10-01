@@ -1,18 +1,17 @@
-package alarm_sevice.domain.alarm.kafkaDto.waiting;
+package alarm_sevice.kafka.booking;
 
 import alarm_sevice.domain.alarm.enums.ServiceType;
 
 import java.time.LocalDateTime;
 
-public record CustomerWaitingDto(
+public record RestaurantBookDto(
         Long userId,
         ServiceType serviceType,
         Long serviceId,
-        CustomerWaitingType customerWaitingType,
+        String restaurantName,
         String userName,
         Integer people,
-        LocalDateTime date,
-        Integer waiting
+        LocalDateTime date
 
 ) {
 }

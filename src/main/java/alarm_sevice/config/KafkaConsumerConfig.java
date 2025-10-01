@@ -1,12 +1,12 @@
 package alarm_sevice.config;
 
-import alarm_sevice.domain.alarm.kafkaDto.backoffice.BackofficeRegisterDto;
-import alarm_sevice.domain.alarm.kafkaDto.booking.*;
-import alarm_sevice.domain.alarm.kafkaDto.register.ServiceRegisterRequestDto;
-import alarm_sevice.domain.alarm.kafkaDto.waiting.CustomerFromSellerCancelDto;
-import alarm_sevice.domain.alarm.kafkaDto.waiting.CustomerFromSellerDto;
-import alarm_sevice.domain.alarm.kafkaDto.waiting.CustomerWaitingDto;
-import alarm_sevice.domain.alarm.kafkaDto.waiting.SellerDto;
+import alarm_sevice.kafka.backoffice.BackofficeRegisterDto;
+import alarm_sevice.kafka.booking.*;
+import alarm_sevice.kafka.register.ServiceRegisterRequestDto;
+import alarm_sevice.kafka.waiting.CustomerFromSellerCancelDto;
+import alarm_sevice.kafka.waiting.CustomerFromSellerDto;
+import alarm_sevice.kafka.waiting.CustomerWaitingDto;
+import alarm_sevice.kafka.waiting.SellerDto;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;

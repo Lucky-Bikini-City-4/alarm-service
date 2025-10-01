@@ -1,4 +1,4 @@
-package alarm_sevice.domain.alarm.kafkaDto.backoffice;
+package alarm_sevice.kafka.backoffice;
 
 import alarm_sevice.domain.alarm.enums.ServiceType;
 

@@ -1,4 +1,4 @@
-package alarm_sevice.domain.alarm.kafkaDto.register;
+package alarm_sevice.kafka.register;
 
 public enum Status {
     REQUESTED,

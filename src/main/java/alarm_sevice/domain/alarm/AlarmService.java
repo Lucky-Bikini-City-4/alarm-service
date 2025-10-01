@@ -1,24 +1,22 @@
 package alarm_sevice.domain.alarm;
 
 import alarm_sevice.domain.alarm.dto.ResponseDto;
-import alarm_sevice.domain.alarm.kafkaDto.backoffice.BackofficeRegisterDto;
-import alarm_sevice.domain.alarm.kafkaDto.booking.*;
-import alarm_sevice.domain.alarm.kafkaDto.register.ServiceRegisterRequestDto;
-import alarm_sevice.domain.alarm.kafkaDto.waiting.CustomerFromSellerCancelDto;
-import alarm_sevice.domain.alarm.kafkaDto.waiting.CustomerFromSellerDto;
-import alarm_sevice.domain.alarm.kafkaDto.waiting.CustomerWaitingDto;
-import alarm_sevice.domain.alarm.kafkaDto.waiting.SellerDto;
+import alarm_sevice.domain.emitter.EmitterRepository;
+import alarm_sevice.domain.emitter.EmitterService;
+import alarm_sevice.kafka.backoffice.BackofficeRegisterDto;
+import alarm_sevice.kafka.booking.*;
+import alarm_sevice.kafka.register.ServiceRegisterRequestDto;
+import alarm_sevice.kafka.waiting.CustomerFromSellerCancelDto;
+import alarm_sevice.kafka.waiting.CustomerFromSellerDto;
+import alarm_sevice.kafka.waiting.CustomerWaitingDto;
+import alarm_sevice.kafka.waiting.SellerDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -26,19 +24,8 @@ import java.util.Map;
 public class AlarmService {
 
     private final AlarmRepository alarmRepository;
-    private final KafkaTemplate<String, RestaurantBookDto> kafkaTemplate1;
-    private final KafkaTemplate<String, RestaurantBookConfirmDto> kafkaTemplate2;
-    private final static Long TIMEOUT = 60L * 1000 * 60;
-    private final EmitterRepository emitterRepository;
+    private final EmitterService emitterService;
 
-
-    public void sendMessageQueue1(String topic, String key, RestaurantBookDto dto) {
-        kafkaTemplate1.send(topic, key, dto);
-    }
-
-    public void sendMessageQueue2(String topic, String key, RestaurantBookConfirmDto dto) {
-        kafkaTemplate2.send(topic, key, dto);
-    }
 
     @KafkaListener(groupId = "booking", topics = "restaurant-book")
     @Transactional
@@ -52,7 +39,6 @@ public class AlarmService {
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-
     }
 
     @KafkaListener(groupId = "booking", topics = "restaurant-book-confirm")
@@ -218,42 +204,6 @@ public class AlarmService {
         sendAlarmSSE(alarm);
     }
 
-    public SseEmitter subscribe(Long userId, String lastEventId) {
-
-        String id = createSseIdWithCurrentTime(userId);
-        SseEmitter emitter = new SseEmitter(TIMEOUT);
-        emitterRepository.save(id, emitter);
-
-        // Emitter가 타임아웃 되었을 때(지정된 시간동안 어떠한 이벤트도 전송되지 않았을 때) Emitter를 삭제한다.
-        emitter.onCompletion(() -> emitterRepository.deleteById(id));
-        emitter.onTimeout(() -> emitterRepository.deleteById(id));
-        emitter.onError((e) -> emitterRepository.deleteById(id));
-
-        //503 에러 방지
-        sendToClient(emitter, id, "Successfully Connected. [userId = " + userId + " ]");
-
-        if (!lastEventId.isEmpty()) {
-            Map<String, Object> eventCaches = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(userId));
-            log.info("*** [ {} Events Occurred While Unconnected ] ***", eventCaches.size());
-            eventCaches.entrySet().stream()
-                    .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-                    .forEach(entry -> {
-                        sendToClient(emitter, entry.getKey(), entry.getValue());
-                    });
-        }
-        return emitter;
-    }
-
-    @Transactional
-    public Map<String, Object> allCache() {
-        return emitterRepository.findAllEventCacheStartWithByMemberId("1");
-    }
-
-    @Transactional
-    public Map<String, SseEmitter> allEmitter() {
-        return emitterRepository.findAllEmittersStartWithUserId("1");
-    }
-
     @Transactional
     public List<ResponseDto> getAllByUserId(Long userId) {
         List<Alarm> alarmList = alarmRepository.findAllByUserId(userId);
@@ -278,35 +228,7 @@ public class AlarmService {
     }
 
     private void sendAlarmSSE(Alarm alarm) {
-        String id = createSseIdWithCurrentTime(alarm.getUserId());
-        emitterRepository.saveEventCache(id, alarm.getTitle() + alarm.getContent());
-        log.info("*** [Event Cache Saved] ***");
-        Map<String, SseEmitter> emitters = emitterRepository.findAllEmittersStartWithUserId(String.valueOf(alarm.getUserId()));
-        emitters.forEach( //사용자 여러 브라우저로 로그인 했을 경우 존재
-                (key, emitter) -> {
-                    sendToClient(emitter, id, alarm.getTitle() + alarm.getContent());
-                }
-        );
+        emitterService.sendAlarmSSE(alarm);
     }
 
-    private void sendToClient(SseEmitter emitter, String id, Object data) {
-        if (emitter != null) {
-            try {
-                emitter.send(SseEmitter.event()
-                        .id(id)
-                        .name("Alarm SSE")
-                        .data(data));
-                log.info("*** [SSE Successfully Sent to User: {} ] *** ", id);
-            } catch (IOException exception) {
-                emitterRepository.deleteById(id);
-//                emitter.completeWithError(exception);
-                log.error("*** [SSE Sent Failed to User {} ]*** \n*** [ Caused by {} ] ***", id, exception.getMessage());
-//                throw new RuntimeException("SSE 전송 실패 : 연결 오류");
-            }
-        }
-    }
-
-    private String createSseIdWithCurrentTime(Long userId) {
-        return userId + "_" + System.currentTimeMillis();
-    }
 }

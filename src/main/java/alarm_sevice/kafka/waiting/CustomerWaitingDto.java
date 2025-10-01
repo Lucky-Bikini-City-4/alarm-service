@@ -1,18 +1,18 @@
-package alarm_sevice.domain.alarm.kafkaDto.waiting;
+package alarm_sevice.kafka.waiting;
 
 import alarm_sevice.domain.alarm.enums.ServiceType;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
-public record CustomerFromSellerDto(
-
+public record CustomerWaitingDto(
         Long userId,
         ServiceType serviceType,
         Long serviceId,
-        FromSellerType type,
+        CustomerWaitingType customerWaitingType,
         String userName,
-        LocalDateTime deadline
+        Long people,
+        LocalDateTime date,
+        Long waiting
 
 ) {
 }

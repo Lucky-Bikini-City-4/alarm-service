@@ -1,8 +1,7 @@
 package alarm_sevice.config;
 
-import alarm_sevice.domain.alarm.dto.CreateRequestDto;
-import alarm_sevice.domain.alarm.kafkaDto.booking.RestaurantBookConfirmDto;
-import alarm_sevice.domain.alarm.kafkaDto.booking.RestaurantBookDto;
+import alarm_sevice.kafka.booking.RestaurantBookConfirmDto;
+import alarm_sevice.kafka.booking.RestaurantBookDto;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.context.annotation.Bean;
